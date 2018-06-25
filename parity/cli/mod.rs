@@ -450,36 +450,36 @@ usage! {
 			"Provide a file containing enodes, one per line. These nodes will always have a reserved slot on top of the normal maximum peers.",
 
 		["API and Console Options – RPC"]
-			FLAG flag_no_jsonrpc: (bool) = false, or |c: &Config| c.rpc.as_ref()?.disable.clone(),
-			"--no-jsonrpc",
+			FLAG flag_no_jsonhttp: (bool) = false, or |c: &Config| c.http.as_ref()?.disable.clone(),
+			"--no-jsonhttp",
 			"Disable the JSON-RPC API server.",
 
-			ARG arg_jsonrpc_port: (u16) = 8545u16, or |c: &Config| c.rpc.as_ref()?.port.clone(),
-			"--jsonrpc-port=[PORT]",
+			ARG arg_jsonhttp_port: (u16) = 8545u16, or |c: &Config| c.http.as_ref()?.port.clone(),
+			"--jsonhttp-port=[PORT]",
 			"Specify the port portion of the JSONRPC API server.",
 
-			ARG arg_jsonrpc_interface: (String)  = "local", or |c: &Config| c.rpc.as_ref()?.interface.clone(),
-			"--jsonrpc-interface=[IP]",
+			ARG arg_jsonhttp_interface: (String)  = "local", or |c: &Config| c.http.as_ref()?.interface.clone(),
+			"--jsonhttp-interface=[IP]",
 			"Specify the hostname portion of the JSONRPC API server, IP should be an interface's IP address, or all (all interfaces) or local.",
 
-			ARG arg_jsonrpc_apis: (String) = "web3,eth,pubsub,net,parity,private,parity_pubsub,traces,rpc,shh,shh_pubsub", or |c: &Config| c.rpc.as_ref()?.apis.as_ref().map(|vec| vec.join(",")),
-			"--jsonrpc-apis=[APIS]",
-			"Specify the APIs available through the JSONRPC interface using a comma-delimited list of API names. Possible names are: all, safe, web3, net, eth, pubsub, personal, signer, parity, parity_pubsub, parity_accounts, parity_set, traces, rpc, secretstore, shh, shh_pubsub. You can also disable a specific API by putting '-' in the front, example: all,-personal. safe contains following apis: web3, net, eth, pubsub, parity, parity_pubsub, traces, rpc, shh, shh_pubsub",
+			ARG arg_jsonhttp_apis: (String) = "web3,eth,net,parity,private,traces,rpc,shh", or |c: &Config| c.http.as_ref()?.apis.as_ref().map(|vec| vec.join(",")),
+			"--jsonhttp-apis=[APIS]",
+			"Specify the APIs available through the JSONRPC interface using a comma-delimited list of API names. Possible names are: all, safe, web3, net, eth, personal, signer, parity, parity_accounts, parity_set, traces, rpc, secretstore, shh. You can also disable a specific API by putting '-' in the front, example: all,-personal. safe contains following apis: web3, net, eth, traces, rpc, shh",
 
-			ARG arg_jsonrpc_hosts: (String) = "none", or |c: &Config| c.rpc.as_ref()?.hosts.as_ref().map(|vec| vec.join(",")),
-			"--jsonrpc-hosts=[HOSTS]",
+			ARG arg_jsonhttp_hosts: (String) = "none", or |c: &Config| c.http.as_ref()?.hosts.as_ref().map(|vec| vec.join(",")),
+			"--jsonhttp-hosts=[HOSTS]",
 			"List of allowed Host header values. This option will validate the Host header sent by the browser, it is additional security against some attack vectors. Special options: \"all\", \"none\",.",
 
-			ARG arg_jsonrpc_threads: (usize) = 4usize, or |c: &Config| c.rpc.as_ref()?.processing_threads,
-			"--jsonrpc-threads=[THREADS]",
+			ARG arg_jsonhttp_threads: (usize) = 4usize, or |c: &Config| c.http.as_ref()?.processing_threads,
+			"--jsonhttp-threads=[THREADS]",
 			"Turn on additional processing threads in all RPC servers. Setting this to non-zero value allows parallel cpu-heavy queries execution.",
 
-			ARG arg_jsonrpc_cors: (String) = "none", or |c: &Config| c.rpc.as_ref()?.cors.as_ref().map(|vec| vec.join(",")),
-			"--jsonrpc-cors=[URL]",
+			ARG arg_jsonhttp_cors: (String) = "none", or |c: &Config| c.http.as_ref()?.cors.as_ref().map(|vec| vec.join(",")),
+			"--jsonhttp-cors=[URL]",
 			"Specify CORS header for JSON-RPC API responses. Special options: \"all\", \"none\".",
 
-			ARG arg_jsonrpc_server_threads: (Option<usize>) = None, or |c: &Config| c.rpc.as_ref()?.server_threads,
-			"--jsonrpc-server-threads=[NUM]",
+			ARG arg_jsonhttp_server_threads: (Option<usize>) = None, or |c: &Config| c.http.as_ref()?.server_threads,
+			"--jsonhttp-server-threads=[NUM]",
 			"Enables multiple threads handling incoming connections for HTTP JSON-RPC server.",
 
 		["API and Console Options – WebSockets"]
@@ -1052,7 +1052,7 @@ struct Config {
 	account: Option<Account>,
 	ui: Option<Ui>,
 	network: Option<Network>,
-	rpc: Option<Rpc>,
+	http: Option<Http>,
 	websockets: Option<Ws>,
 	ipc: Option<Ipc>,
 	dapps: Option<Dapps>,
@@ -1156,7 +1156,7 @@ struct Network {
 
 #[derive(Default, Debug, PartialEq, Deserialize)]
 #[serde(deny_unknown_fields)]
-struct Rpc {
+struct Http {
 	disable: Option<bool>,
 	port: Option<u16>,
 	interface: Option<String>,

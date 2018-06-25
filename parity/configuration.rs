@@ -775,7 +775,7 @@ impl Configuration {
 	fn rpc_apis(&self) -> String {
 		let mut apis: Vec<&str> = self.args.arg_rpcapi
 			.as_ref()
-			.unwrap_or(&self.args.arg_jsonrpc_apis)
+			.unwrap_or(&self.args.arg_jsonhttp_apis)
 			.split(",")
 			.collect();
 
@@ -797,7 +797,7 @@ impl Configuration {
 	}
 
 	fn rpc_cors(&self) -> Option<Vec<String>> {
-		let cors = self.args.arg_rpccorsdomain.clone().unwrap_or_else(|| self.args.arg_jsonrpc_cors.to_owned());
+		let cors = self.args.arg_rpccorsdomain.clone().unwrap_or_else(|| self.args.arg_jsonhttp_cors.to_owned());
 		Self::cors(&cors)
 	}
 
@@ -828,7 +828,7 @@ impl Configuration {
 	}
 
 	fn rpc_hosts(&self) -> Option<Vec<String>> {
-		self.hosts(&self.args.arg_jsonrpc_hosts, &self.rpc_interface())
+		self.hosts(&self.args.arg_jsonhttp_hosts, &self.rpc_interface())
 	}
 
 	fn ws_hosts(&self) -> Option<Vec<String>> {
@@ -870,15 +870,15 @@ impl Configuration {
 		let conf = HttpConfiguration {
 			enabled: self.rpc_enabled(),
 			interface: self.rpc_interface(),
-			port: self.args.arg_ports_shift + self.args.arg_rpcport.unwrap_or(self.args.arg_jsonrpc_port),
+			port: self.args.arg_ports_shift + self.args.arg_rpcport.unwrap_or(self.args.arg_jsonhttp_port),
 			apis: self.rpc_apis().parse()?,
 			hosts: self.rpc_hosts(),
 			cors: self.rpc_cors(),
-			server_threads: match self.args.arg_jsonrpc_server_threads {
+			server_threads: match self.args.arg_jsonhttp_server_threads {
 				Some(threads) if threads > 0 => threads,
 				_ => 1,
 			},
-			processing_threads: self.args.arg_jsonrpc_threads,
+			processing_threads: self.args.arg_jsonhttp_threads,
 		};
 
 		Ok(conf)
@@ -1024,7 +1024,7 @@ impl Configuration {
 	}
 
 	fn rpc_interface(&self) -> String {
-		let rpc_interface = self.args.arg_rpcaddr.clone().unwrap_or(self.args.arg_jsonrpc_interface.clone());
+		let rpc_interface = self.args.arg_rpcaddr.clone().unwrap_or(self.args.arg_jsonhttp_interface.clone());
 		self.interface(&rpc_interface)
 	}
 
@@ -1091,7 +1091,7 @@ impl Configuration {
 	}
 
 	fn rpc_enabled(&self) -> bool {
-		!self.args.flag_jsonrpc_off && !self.args.flag_no_jsonrpc
+		!self.args.flag_jsonrpc_off && !self.args.flag_no_jsonhttp
 	}
 
 	fn ws_enabled(&self) -> bool {
@@ -1564,10 +1564,10 @@ mod tests {
 
 		// when
 		let conf1 = parse(&["parity", "-j",
-						 "--jsonrpc-port", "8000",
-						 "--jsonrpc-interface", "all",
-						 "--jsonrpc-cors", "*",
-						 "--jsonrpc-apis", "web3,eth"
+						 "--jsonhttp-port", "8000",
+						 "--jsonhttp-interface", "all",
+						 "--jsonhttp-cors", "*",
+						 "--jsonhttp-apis", "web3,eth"
 						 ]);
 		let conf2 = parse(&["parity", "--rpc",
 						  "--rpcport", "8000",
@@ -1587,9 +1587,9 @@ mod tests {
 
 		// when
 		let conf0 = parse(&["parity"]);
-		let conf1 = parse(&["parity", "--jsonrpc-hosts", "none"]);
-		let conf2 = parse(&["parity", "--jsonrpc-hosts", "all"]);
-		let conf3 = parse(&["parity", "--jsonrpc-hosts", "parity.io,something.io"]);
+		let conf1 = parse(&["parity", "--jsonhttp-hosts", "none"]);
+		let conf2 = parse(&["parity", "--jsonhttp-hosts", "all"]);
+		let conf3 = parse(&["parity", "--jsonhttp-hosts", "parity.io,something.io"]);
 
 		// then
 		assert_eq!(conf0.rpc_hosts(), Some(Vec::new()));
@@ -1817,7 +1817,7 @@ mod tests {
 
 		// when
 		let conf0 = parse(&["parity", "--ports-shift", "1", "--stratum"]);
-		let conf1 = parse(&["parity", "--ports-shift", "1", "--jsonrpc-port", "8544"]);
+		let conf1 = parse(&["parity", "--ports-shift", "1", "--jsonhttp-port", "8544"]);
 
 		// then
 		assert_eq!(conf0.net_addresses().unwrap().0.port(), 30304);
